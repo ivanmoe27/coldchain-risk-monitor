@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from app.database import engine, SessionLocal
 from app.models import Base, Shipment
+from prometheus_fastapi_instrumentator import Instrumentator
 
 
 app = FastAPI(
@@ -10,11 +11,13 @@ app = FastAPI(
 )
 
 Base.metadata.create_all(bind=engine)
+Instrumentator().instrument(app).expose(app)
 
 # Modelo de datos
 
 
 class TemperatureReading(BaseModel):
+    order_id: str
     shipment_id: str
     product_type: str
     temperature: float
@@ -56,9 +59,11 @@ def add_temperature(reading: TemperatureReading):
     db = get_db()
 
     shipment = Shipment(
+        order_id=reading.order_id,
         shipment_id=reading.shipment_id,
         product_type=reading.product_type,
         temperature=reading.temperature
+
     )
 
     db.add(shipment)
