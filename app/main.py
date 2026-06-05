@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from app.database import engine, SessionLocal
 from app.models import Base, Shipment
 from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import Gauge
 
 
 app = FastAPI(
@@ -12,6 +13,37 @@ app = FastAPI(
 
 Base.metadata.create_all(bind=engine)
 Instrumentator().instrument(app).expose(app)
+
+total_orders_gauge = Gauge(
+    "coldchain_total_orders",
+    "Total number of unique orders"
+)
+
+total_shipments_gauge = Gauge(
+    "coldchain_total_shipments",
+    "Total number of shipments"
+)
+
+low_risk_gauge = Gauge(
+    "coldchain_low_risk_shipments",
+    "Total number of low risk shipments"
+)
+
+medium_risk_gauge = Gauge(
+    "coldchain_medium_risk_shipments",
+    "Total number of medium risk shipments"
+)
+
+high_risk_gauge = Gauge(
+    "coldchain_high_risk_shipments",
+    "Total number of high risk shipments"
+)
+
+high_risk_orders_gauge = Gauge(
+    "coldchain_orders_with_high_risk",
+    "Total number of orders with at least one high risk shipment"
+)
+
 
 # Modelo de datos
 
@@ -37,6 +69,41 @@ def calculate_risk(temperature: float):
         return "MEDIUM"
 
     return "HIGH"
+
+def update_business_metrics():
+
+    db = get_db()
+    shipments = db.query(Shipment).all()
+
+    total_shipments = len(shipments)
+    total_orders = len(set(shipment.order_id for shipment in shipments))
+
+    low_risk = 0
+    medium_risk = 0
+    high_risk = 0
+    high_risk_orders = set()
+
+    for shipment in shipments:
+        risk = calculate_risk(shipment.temperature)
+
+        if risk == "LOW":
+            low_risk += 1
+
+        elif risk == "MEDIUM":
+            medium_risk += 1
+
+        else:
+            high_risk += 1
+            high_risk_orders.add(shipment.order_id)
+
+    total_orders_gauge.set(total_orders)
+    total_shipments_gauge.set(total_shipments)
+    low_risk_gauge.set(low_risk)
+    medium_risk_gauge.set(medium_risk)
+    high_risk_gauge.set(high_risk)
+    high_risk_orders_gauge.set(len(high_risk_orders))
+
+    db.close()
 
 
 @app.get("/")
@@ -71,6 +138,8 @@ def add_temperature(reading: TemperatureReading):
     db.refresh(shipment)
 
     db.close()
+
+    update_business_metrics()
 
     return {
         "message": "Temperature registered successfully",
@@ -111,4 +180,12 @@ def get_risk(shipment_id: str):
 
     return {
         "error": "Shipment not found"
+    }
+
+@app.get("/business-metrics-refresh")
+def refresh_business_metrics():
+    update_business_metrics()
+
+    return {
+        "message": "Business metrics updated successfully"
     }
