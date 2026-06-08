@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 coldchain.db
 .env
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
