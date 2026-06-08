@@ -7,7 +7,7 @@ resource "aws_ecr_repository" "coldchain_app" {
   }
 
   tags = {
-    Project = "ColdChainRiskMonitor"
+    Project   = "ColdChainRiskMonitor"
     ManagedBy = "Terraform"
   }
 }
