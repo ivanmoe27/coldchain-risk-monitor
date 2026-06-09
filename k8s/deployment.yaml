@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coldchain-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coldchain-api
+  template:
+    metadata:
+      labels:
+        app: coldchain-api
+    spec:
+      containers:
+        - name: coldchain-api
+          image: 743771860281.dkr.ecr.us-east-1.amazonaws.com/coldchain-risk-monitor:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000

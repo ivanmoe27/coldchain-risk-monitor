@@ -17,3 +17,9 @@ availability_zones = [
   "us-east-1a",
   "us-east-1b"
 ]
+
+cluster_name        = "coldchain-eks"
+node_instance_types = ["t3.small"]
+node_desired_size   = 1
+node_min_size       = 1
+node_max_size       = 1

@@ -7,10 +7,12 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name      = "coldchain-public-subnet-${count.index + 1}"
-    Project   = "ColdChainRiskMonitor"
-    ManagedBy = "Terraform"
-    Type      = "Public"
+    Name                                        = "coldchain-public-subnet-${count.index + 1}"
+    Project                                     = "ColdChainRiskMonitor"
+    ManagedBy                                   = "Terraform"
+    Type                                        = "Public"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                    = "1"
   }
 }
 
@@ -22,9 +24,11 @@ resource "aws_subnet" "private" {
   availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name      = "coldchain-private-subnet-${count.index + 1}"
-    Project   = "ColdChainRiskMonitor"
-    ManagedBy = "Terraform"
-    Type      = "Private"
+    Name                                        = "coldchain-private-subnet-${count.index + 1}"
+    Project                                     = "ColdChainRiskMonitor"
+    ManagedBy                                   = "Terraform"
+    Type                                        = "Private"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"           = "1"
   }
 }
