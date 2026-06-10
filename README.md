@@ -36,7 +36,7 @@ In a production scenario, the risk model could be extended to consider product t
 The application is deployed on AWS using Amazon EKS and exposes the FastAPI backend through an AWS Load Balancer.
 
 Prometheus runs inside the Kubernetes cluster and scrapes the `/metrics` endpoint exposed by the application. Grafana is also deployed inside the cluster and connects to Prometheus as a data source to visualize business and technical metrics.
-![Architecture](image.png)
+![Architecture](Architecture.png)
 
 ## Technologies Used
 Category	            Technology
@@ -140,9 +140,9 @@ Prometheus
         v
 Grafana
 
-![Prometheus](image-1.png)
-![Grafana Technical Dashboard](image-2.png)
-![Grafana Business Dashboard](image-3.png)
+![Prometheus](Prometheus.png)
+![Grafana Technical Dashboard](Grafana-technical.png)
+![Grafana Business Dashboard](Grafana-business.png)
 
 
 ## Infrastructure as Code
@@ -439,13 +439,13 @@ Distributed tracing
 Centralized logging
 
 ## Screenshots
-![Architecture](image-4.png)
-![EKS Cluster](image-5.png)
-![Kubernetes Resources](image-6.png)
-![Swagger API](image-7.png)
-![Prometheus](image-8.png)
-![Grafana Technical Dashboard](image-9.png)
-![Grafana Business Dashboard](image-10.png)
+![Architecture](Architecture2.png)
+![EKS Cluster](EKS.png)
+![Kubernetes Resources](Kubernetes.png)
+![Swagger API](Swagger.png)
+![Prometheus](Prometheus2.png)
+![Grafana Technical Dashboard](Grafana-technical2.png)
+![Grafana Business Dashboard](Grafana-business2.png)
 
 ## Author
 Iván Montes de Oca Estrada
