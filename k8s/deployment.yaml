@@ -14,7 +14,31 @@ spec:
     spec:
       containers:
         - name: coldchain-api
-          image: 743771860281.dkr.ecr.us-east-1.amazonaws.com/coldchain-risk-monitor:latest
+          image: <your-ecr-repository>:v1.0.0
           imagePullPolicy: Always
+          
           ports:
             - containerPort: 8000
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+               path: /health
+               port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+

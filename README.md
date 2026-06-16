@@ -53,26 +53,41 @@ Visualization	        Grafana
 Cloud Provider	        AWS
 
 ## Application Features
+
 The application exposes a REST API that allows users to register shipments and monitor cold-chain performance.
 
 Available Endpoints
-Endpoint	Method	Description
-/	GET	Application information
-/health	GET	Health check endpoint
-/temperature	POST	Register a shipment temperature
-/shipments	GET	Retrieve all registered shipments
-/metrics	GET	Prometheus metrics endpoint
+
+| Endpoint                    | Method | Description                                          |
+| --------------------------- | ------ | ---------------------------------------------------- |
+| `/`                         | GET    | Application information                              |
+| `/health`                   | GET    | Health check endpoint                                |
+| `/temperature`              | POST   | Register a shipment temperature                      |
+| `/shipments`                | GET    | Retrieve all registered shipments                    |
+| `/risk/{shipment_id}`       | GET    | Retrieve risk classification for a specific shipment |
+| `/business-metrics-refresh` | GET    | Refresh business metrics exposed to Prometheus       |
+| `/metrics`                  | GET    | Prometheus metrics endpoint                          |
+
 Example Request
+
+```json
 {
   "order_id": "ORDER-001",
   "shipment_id": "SHIP-001",
   "product_type": "Vaccines",
   "temperature": 4.5
 }
+```
+
 Example Response
+
+```json
 {
-  "risk": "LOW"
+  "message": "Temperature registered successfully",
+  "shipment_id": "SHIP-001"
 }
+```
+
 
 ## Monitoring & Observability
 Observability is a key component of modern cloud-native applications.
@@ -406,37 +421,64 @@ terraform destroy
 
 This approach ensures that AWS resources only exist while actively being used.
 
+## Current Limitations
+The current implementation prioritizes simplicity and cost efficiency.
+
+As a result:
+
+- SQLite runs inside the application pod and does not use persistent storage.
+- Prometheus does not currently use a Persistent Volume.
+- Grafana dashboards are stored inside the Grafana pod and are not persisted automatically.
+
+If the pods are recreated, the stored data and dashboards may be lost.
+
+In a production environment, Persistent Volumes and managed database services such as Amazon RDS should be used.
+
 ## Future Improvements
 Although the project fulfills its current objectives, several enhancements could be implemented in a production environment.
 
-Application Improvements:
+Application Improvements
+
 Replace SQLite with Amazon RDS PostgreSQL
 Add user authentication and authorization
-Implement shipment management UI
+Implement a shipment management UI
 Support multiple cold-chain product categories
-Advanced risk classification models
+Advanced risk classification models based on product type, exposure time and historical trends
+Enhanced input validation and error handling
+Unit tests for risk classification logic
+Integration tests for API endpoints
 
-Infrastructure Improvements:
+Infrastructure Improvements
+
 Multi-node EKS cluster
 High availability deployment
 Managed database service
-Persistent Volumes for Grafana and Prometheus
+Persistent Volumes for SQLite, Grafana and Prometheus
 Kubernetes Secrets for credential management
+AWS Secrets Manager integration
 Infrastructure modularization using Terraform modules
+Dedicated environments (Development, Staging and Production)
 
-DevOps Improvements:
+DevOps Improvements
+
 CI/CD pipeline using GitHub Actions
 Automated testing
 Automated image deployment
-Blue/Green deployments
-Canary deployments
+Automated deployment to Amazon EKS
+Security scanning of container images
+Infrastructure validation and Terraform linting
 
-Monitoring Improvements:
+Monitoring Improvements
+
 Prometheus alerting rules
 Grafana alerting
 Email and Slack notifications
 Distributed tracing
 Centralized logging
+Kubernetes node and pod resource monitoring
+Application performance monitoring (APM)
+Custom dashboards for business and operational KPIs
+
 
 ## Screenshots
 ![Architecture](Architecture2.png)
